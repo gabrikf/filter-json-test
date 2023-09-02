@@ -8,15 +8,15 @@ Running the project:
 
 Improvements to go live:
 
-- Adding a link url query to be able to share some filtered value.
+- Implement filter sharing using query params.
 - Saving on local storage what user type on value input on a object separated by fields containing an array with last 100 entries to use as suggestion while user is searching. (Can be used with [MUI Auto Complete](https://mui.com/material-ui/react-autocomplete/))
-- Use next.js to use static props for google.
-- Authentication to add the link.
+- Use Next.JS to create a static page that can be scanned by SEO mechanisms.
+- Add an authentication feature to be able to fetch JSON files behind an authenticated environment.
 - If data would be on a very high amount, would create a backend to deal with pagination and use React Query to cache data.
 - Dark theme.
 - Import alias.
 - Zustand to control the context with a simple way.
-- Progress bar below the url input.
+- Progress bar below the URL input in order to have feedback while fetching the JSON data.
 
 Additional features:
 
