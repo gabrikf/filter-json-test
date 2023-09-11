@@ -1,10 +1,11 @@
 import { v4 as uuid } from "uuid";
 import { IAndFilters, IOrFilters } from "../interfaces/filterInterfaces";
+import { OperatorEnum } from "../enums/OperatorEnum";
 
 export const INITIAL_FILTER_OPTION_VALUE: () => IOrFilters = () => ({
   id: uuid(),
   column: "",
-  operator: undefined,
+  operator: OperatorEnum.Equal,
   value: "",
 });
 
