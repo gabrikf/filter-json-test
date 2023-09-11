@@ -40,6 +40,7 @@ export interface IFilterError {
 interface IFilterProps {
   loading: boolean;
   onFilter: OnFilterFunc;
+  onResetFilter: () => void;
   fields?: IOptions[];
   error?: IFilterError;
 }
@@ -53,13 +54,25 @@ interface IChangeItemParams<T> {
 
 const FULL_WIDTH = "calc(100% - 40px)" as const;
 
-export function Filter({ loading, onFilter, fields, error }: IFilterProps) {
+export function Filter({
+  loading,
+  onFilter,
+  fields,
+  error,
+  onResetFilter,
+}: IFilterProps) {
   const [filterOptions, setFilterOptions] = useState<IAndFilters[]>([
     INITIAL_FILTER_OPTION_STATE(),
   ]);
 
-  const isInitialState =
+  const isFirstLine =
     filterOptions.length === 1 && filterOptions[0].values.length === 1;
+  const initialValue = filterOptions[0].values[0];
+  const isInitialState =
+    isFirstLine &&
+    !(Object.keys(initialValue) as Array<keyof typeof initialValue>)
+      .filter((key) => !["id", "operator"].includes(key))
+      .some((key) => !!initialValue[key]);
 
   function addOr(id: string) {
     setFilterOptions((currentValues) => {
@@ -81,7 +94,6 @@ export function Filter({ loading, onFilter, fields, error }: IFilterProps) {
       return [...currentValues, INITIAL_FILTER_OPTION_STATE()];
     });
   }
-
   function removeOr(parentId: string, id: string) {
     if (isInitialState) {
       return;
@@ -140,6 +152,11 @@ export function Filter({ loading, onFilter, fields, error }: IFilterProps) {
       return debouncedOnChangeItem();
     }
     onFilter(filterOptions);
+  }
+
+  function resetFilter() {
+    onResetFilter();
+    setFilterOptions([INITIAL_FILTER_OPTION_STATE()]);
   }
 
   return (
@@ -253,9 +270,9 @@ export function Filter({ loading, onFilter, fields, error }: IFilterProps) {
                           />
 
                           <Delete
-                            cursor={isInitialState ? "not-allowed" : "pointer"}
+                            cursor={isFirstLine ? "not-allowed" : "pointer"}
                             onClick={() => removeOr(filterGroup.id, id)}
-                            color={isInitialState ? "disabled" : "warning"}
+                            color={isFirstLine ? "disabled" : "warning"}
                           />
                         </Fragment>
                       )}
@@ -295,9 +312,7 @@ export function Filter({ loading, onFilter, fields, error }: IFilterProps) {
               </Button>
               <Button
                 disabled={isInitialState || loading}
-                onClick={() =>
-                  setFilterOptions([INITIAL_FILTER_OPTION_STATE()])
-                }
+                onClick={resetFilter}
                 startIcon={<RestartAlt />}
                 variant="contained"
               >

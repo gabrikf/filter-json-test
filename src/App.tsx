@@ -112,6 +112,10 @@ function App() {
         onFilter={onFilter}
         loading={isLoading}
         error={error?.filterError}
+        onResetFilter={() => {
+          setError(undefined);
+          setFilteredData(data);
+        }}
       />
       <Table
         columns={columns}

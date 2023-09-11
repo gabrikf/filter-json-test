@@ -5,7 +5,7 @@ export type OnFilterFunc = (filters: IAndFilters[]) => void;
 export interface IOrFilters {
   id: string;
   column: string;
-  operator?: OperatorEnum;
+  operator: OperatorEnum;
   value: string;
 }
 
