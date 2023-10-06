@@ -1,6 +1,6 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { DataType } from "../App";
-import { TableSkeleton } from "./feedback/Skeleton";
+import { DataType } from "../../App";
+import { TableSkeleton } from "../feedback/Skeleton";
 import { Fragment } from "react";
 import { Chip, Stack, Typography } from "@mui/material";
 

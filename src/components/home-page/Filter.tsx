@@ -11,22 +11,22 @@ import {
 } from "@mui/material";
 import { ChangeEvent, Fragment, useState } from "react";
 
-import { OperatorConstant } from "../constants/filterConstants";
+import { OperatorConstant } from "../../constants/filterConstants";
 import {
   INITIAL_FILTER_OPTION_STATE,
   INITIAL_FILTER_OPTION_VALUE,
-} from "../constants/initialFilterValues";
-import { OperatorEnum } from "../enums/OperatorEnum";
+} from "../../constants/initialFilterValues";
+import { OperatorEnum } from "../../enums/OperatorEnum";
 import {
   IAndFilters,
   IOrFilters,
   OnFilterFunc,
-} from "../interfaces/filterInterfaces";
-import { IOptions } from "../interfaces/formInterfaces";
-import { Connector } from "./Connector";
-import { LineSkeleton } from "./feedback/Skeleton";
-import { Select } from "./form/Select";
-import { Tooltip } from "./feedback/Tooltip";
+} from "../../interfaces/filterInterfaces";
+import { IOptions } from "../../interfaces/formInterfaces";
+import { LineSkeleton } from "../feedback/Skeleton";
+import { Select } from "../form/Select";
+import { Tooltip } from "../feedback/Tooltip";
+import { Connector } from "../shared/Connector";
 
 type CustomEvent<T> =
   | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
