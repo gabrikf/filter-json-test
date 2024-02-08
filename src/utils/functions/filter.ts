@@ -10,11 +10,7 @@ export interface IApllyFilterParams {
   value: string;
 }
 
-const NUMERAL_OPERATORS = [
-  OperatorEnum.Equal,
-  OperatorEnum.GreaterThan,
-  OperatorEnum.LessThen,
-];
+const NUMERAL_OPERATORS = [OperatorEnum.GreaterThan, OperatorEnum.LessThen];
 
 function isNumericalOperator(operator: OperatorEnum) {
   return NUMERAL_OPERATORS.includes(operator);
@@ -28,14 +24,8 @@ function applyFilter({ fieldValue, operator, value, id }: IApllyFilterParams) {
         `Value for numerical operators must be a number: ${value}`
       );
     }
-  } else {
-    if (!isNaN(Number(value))) {
-      throw new FilterError(
-        id,
-        `Value for string operators must be a string: ${value}`
-      );
-    }
   }
+
   const convertedValue = isNumericalOperator(operator) ? Number(value) : value;
   const convertedFieldValue = isNumericalOperator(operator)
     ? Number(fieldValue)

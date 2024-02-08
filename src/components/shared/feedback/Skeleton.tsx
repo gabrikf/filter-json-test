@@ -1,5 +1,5 @@
 import { Skeleton, Stack } from "@mui/material";
-import { range } from "../../utils/functions/range";
+import { range } from "../../../utils/functions/range";
 
 interface ITableSkeletonProps {
   rows?: number;

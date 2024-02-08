@@ -1,14 +1,22 @@
-import { Alert, Snackbar, Stack, TextField } from "@mui/material";
+import {
+  Alert,
+  Snackbar,
+  Stack,
+  TextField,
+  Typography,
+  debounce,
+} from "@mui/material";
 import { GridColDef } from "@mui/x-data-grid";
 import axios from "axios";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { Filter, IFilterError } from "./components/home-page/Filter";
 import { Table } from "./components/home-page/Table";
-import { OnFilterFunc } from "./interfaces/filterInterfaces";
-import { IOptions } from "./interfaces/formInterfaces";
+import { INITIAL_FILTER_OPTION_STATE } from "./constants/initialFilterValues";
+import { FilterError } from "./helpers/errors";
+import { IAndFilters } from "./interfaces/filterInterfaces";
+import { convertToOptions } from "./utils/functions/convertToOptions";
 import { applyComplexFilters } from "./utils/functions/filter";
 import { flatArray } from "./utils/functions/flatValues";
-import { FilterError } from "./helpers/errors";
 
 export type DataItem = Record<string, string | number | boolean>;
 export type DataType = DataItem[];
@@ -20,6 +28,9 @@ interface IError {
 }
 
 function App() {
+  const [filterOptions, setFilterOptions] = useState<IAndFilters[]>([
+    INITIAL_FILTER_OPTION_STATE(),
+  ]);
   const [data, setData] = useState<DataType>([]);
   const [filteredData, setFilteredData] = useState<DataType>([]);
   const [error, setError] = useState<IError>();
@@ -28,10 +39,12 @@ function App() {
   async function getData(url: string) {
     setIsLoading(true);
     try {
-      const response = await axios.get<DataType>(url);
-      const flattedValues = flatArray(response.data);
-      setData(flattedValues);
-      setFilteredData(flattedValues);
+      if (url) {
+        const response = await axios.get<DataType>(url);
+        const flattedValues = flatArray(response.data);
+        setData(flattedValues);
+        setFilteredData(flattedValues);
+      }
       setError((currentValues) => ({ ...currentValues, urlError: false }));
     } catch (err) {
       setError((currentValues) => ({ ...currentValues, urlError: true }));
@@ -39,19 +52,17 @@ function App() {
       setIsLoading(false);
     }
   }
+  const deboucedGetData = debounce(getData, 500);
 
-  const total = useMemo(() => {
-    return data.length;
-  }, [data.length]);
-
-  const onFilter = useCallback<OnFilterFunc>(
-    (filters) => {
+  const onFilter = useCallback(
+    (filterValues: IAndFilters[]) => {
       try {
         setError((currentValues) => ({
           ...currentValues,
           filterError: undefined,
         }));
-        return setFilteredData(applyComplexFilters(data, filters));
+
+        return setFilteredData(applyComplexFilters(data, filterValues));
       } catch (err) {
         setError((currentValues) => {
           if (err instanceof FilterError) {
@@ -67,7 +78,17 @@ function App() {
         });
       }
     },
-    [data]
+    [data, setError]
+  );
+
+  const handleChangeFilter = useCallback(
+    (newValue: IAndFilters[], shouldRefilter = false) => {
+      setFilterOptions(newValue);
+      if (shouldRefilter) {
+        onFilter(newValue);
+      }
+    },
+    [onFilter]
   );
 
   const keys = Object.keys(data[0] ?? []);
@@ -79,17 +100,6 @@ function App() {
     };
   });
 
-  function convertToOptions(obj?: object): IOptions[] | undefined {
-    if (!obj) return;
-    return Object.keys(obj)
-      .filter((key) => typeof key === "string")
-      .map((key) => {
-        return {
-          label: key,
-          value: key,
-        };
-      });
-  }
   return (
     <Stack
       spacing={2}
@@ -98,6 +108,7 @@ function App() {
       height="100vh"
       alignItems="start"
     >
+      <Typography variant="h4">Condition Builder</Typography>
       <TextField
         error={error?.urlError}
         fullWidth
@@ -105,12 +116,13 @@ function App() {
         label={error?.urlError ? "Wrong Url" : "Url"}
         placeholder="Insert here the url..."
         variant="outlined"
-        onChange={(e) => getData(e.target.value)}
+        onChange={(e) => deboucedGetData(e.target.value)}
       />
       <Filter
+        filterValues={filterOptions}
+        handleChangeFilter={handleChangeFilter}
         fields={convertToOptions(data[0])}
-        onFilter={onFilter}
-        loading={isLoading}
+        isLoading={isLoading}
         error={error?.filterError}
         onResetFilter={() => {
           setError(undefined);
@@ -120,8 +132,8 @@ function App() {
       <Table
         columns={columns}
         rows={filteredData}
-        loading={isLoading}
-        total={total}
+        isLoading={isLoading}
+        total={data.length}
         totalFiltered={filteredData.length}
       />
       <Snackbar
@@ -132,7 +144,7 @@ function App() {
           }))
         }
         open={!!error?.isToastVisible}
-        autoHideDuration={6000}
+        autoHideDuration={4000}
       >
         <Alert severity="error" sx={{ width: "100%" }}>
           {error?.filterError?.message}

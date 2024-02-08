@@ -11,12 +11,13 @@ function VerticalLine() {
 }
 
 export function Connector({
-  height = "30px",
+  height = "90px",
   boxSize = "86px",
   text,
 }: IConnectorProps) {
+  const verticalHeight = text ? height : `calc(${height} / 2)`;
   return (
-    <Stack alignItems="center" width={boxSize} height={height}>
+    <Stack alignItems="center" width={boxSize} height={verticalHeight}>
       <VerticalLine />
       <Typography>{text}</Typography>
       <VerticalLine />
