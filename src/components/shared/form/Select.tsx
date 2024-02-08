@@ -5,7 +5,7 @@ import {
   MenuItem,
   SelectProps,
 } from "@mui/material";
-import { IOptions } from "../../interfaces/formInterfaces";
+import { IOptions } from "../../../interfaces/formInterfaces";
 
 interface ISelectProps extends SelectProps {
   options?: IOptions[];

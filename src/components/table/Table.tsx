@@ -1,11 +1,12 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { DataType } from "../App";
-import { TableSkeleton } from "./feedback/Skeleton";
+import { DataType } from "../../App";
+
 import { Fragment } from "react";
 import { Chip, Stack, Typography } from "@mui/material";
+import { TableSkeleton } from "./TableSkeleton";
 
 interface ITableProps {
-  loading: boolean;
+  isLoading: boolean;
   rows: DataType;
   columns: GridColDef[];
   total: number;
@@ -17,11 +18,11 @@ const DEFAULT_PAGE_SIZE_ = 10 as const;
 export function Table({
   columns,
   rows,
-  loading,
+  isLoading,
   total,
   totalFiltered,
 }: ITableProps) {
-  if (loading) {
+  if (isLoading) {
     return <TableSkeleton rows={DEFAULT_PAGE_SIZE_} />;
   }
   return (
@@ -32,7 +33,7 @@ export function Table({
         <Chip label={"Filtered: " + totalFiltered} color="primary" />
       </Stack>
       <DataGrid
-        sx={{ width: "100%", maxHeight: "500px" }}
+        sx={{ width: "100%", maxHeight: "500px", minHeight: "500px" }}
         rows={rows}
         columns={columns}
         initialState={{
