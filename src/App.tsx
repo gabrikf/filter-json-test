@@ -56,7 +56,7 @@ function App() {
       setIsLoading(false);
     }
   }
-  const deboucedGetData = debounce(getData, 500);
+  const debouncedGetData = debounce(getData, 500);
 
   const onFilter = useCallback(
     (filterValues: IFilterGroup[]) => {
@@ -120,7 +120,7 @@ function App() {
         label={error?.urlError ? "Wrong Url" : "Url"}
         placeholder="Insert here the url..."
         variant="outlined"
-        onChange={(e) => deboucedGetData(e.target.value)}
+        onChange={(e) => debouncedGetData(e.target.value)}
       />
       <FilterGroup
         filterValues={filterOptions}
