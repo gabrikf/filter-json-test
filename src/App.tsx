@@ -9,11 +9,15 @@ import {
 import { GridColDef } from "@mui/x-data-grid";
 import axios from "axios";
 import { useCallback, useState } from "react";
-import { Filter, IFilterError } from "./components/home-page/Filter";
-import { Table } from "./components/home-page/Table";
+import { FilterGroup, IFilterError } from "./components/filter/FilterGroup";
+import { Table } from "./components/table/Table";
 import { INITIAL_FILTER_OPTION_STATE } from "./constants/initialFilterValues";
 import { FilterError } from "./helpers/errors";
-import { IAndFilters } from "./interfaces/filterInterfaces";
+import {
+  IFilterGroup,
+  IOnChangeFilterParams,
+  OnFilterChangeFunction,
+} from "./interfaces/filterInterfaces";
 import { convertToOptions } from "./utils/functions/convertToOptions";
 import { applyComplexFilters } from "./utils/functions/filter";
 import { flatArray } from "./utils/functions/flatValues";
@@ -28,7 +32,7 @@ interface IError {
 }
 
 function App() {
-  const [filterOptions, setFilterOptions] = useState<IAndFilters[]>([
+  const [filterOptions, setFilterOptions] = useState<IFilterGroup[]>([
     INITIAL_FILTER_OPTION_STATE(),
   ]);
   const [data, setData] = useState<DataType>([]);
@@ -55,7 +59,7 @@ function App() {
   const deboucedGetData = debounce(getData, 500);
 
   const onFilter = useCallback(
-    (filterValues: IAndFilters[]) => {
+    (filterValues: IFilterGroup[]) => {
       try {
         setError((currentValues) => ({
           ...currentValues,
@@ -81,11 +85,11 @@ function App() {
     [data, setError]
   );
 
-  const handleChangeFilter = useCallback(
-    (newValue: IAndFilters[], shouldRefilter = false) => {
-      setFilterOptions(newValue);
+  const handleChangeFilter = useCallback<OnFilterChangeFunction>(
+    ({ newValues, shouldRefilter = true }: IOnChangeFilterParams) => {
+      setFilterOptions(newValues);
       if (shouldRefilter) {
-        onFilter(newValue);
+        onFilter(newValues);
       }
     },
     [onFilter]
@@ -118,7 +122,7 @@ function App() {
         variant="outlined"
         onChange={(e) => deboucedGetData(e.target.value)}
       />
-      <Filter
+      <FilterGroup
         filterValues={filterOptions}
         handleChangeFilter={handleChangeFilter}
         fields={convertToOptions(data[0])}

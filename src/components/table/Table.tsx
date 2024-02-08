@@ -1,8 +1,9 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { DataType } from "../../App";
-import { TableSkeleton } from "../shared/feedback/Skeleton";
+
 import { Fragment } from "react";
 import { Chip, Stack, Typography } from "@mui/material";
+import { TableSkeleton } from "./TableSkeleton";
 
 interface ITableProps {
   isLoading: boolean;

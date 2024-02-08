@@ -1,7 +1,7 @@
 import { DataItem, DataType } from "../../App";
 import { OperatorEnum } from "../../enums/OperatorEnum";
 import { FilterError } from "../../helpers/errors";
-import { IAndFilters, IOrFilters } from "../../interfaces/filterInterfaces";
+import { IFilterGroup, IFilterItem } from "../../interfaces/filterInterfaces";
 
 export interface IApllyFilterParams {
   id: string;
@@ -54,7 +54,7 @@ function applyFilter({ fieldValue, operator, value, id }: IApllyFilterParams) {
   }
 }
 
-function applyOrFilters(item: DataItem, orFilters: IOrFilters[]): boolean {
+function applyOrFilters(item: DataItem, orFilters: IFilterItem[]): boolean {
   return orFilters.some((filter) => {
     if (!filter.value) {
       return true;
@@ -68,7 +68,7 @@ function applyOrFilters(item: DataItem, orFilters: IOrFilters[]): boolean {
   });
 }
 
-function applyAndFilters(item: DataItem, andFilters: IAndFilters[]): boolean {
+function applyAndFilters(item: DataItem, andFilters: IFilterGroup[]): boolean {
   return andFilters.every((filterSet) => {
     return applyOrFilters(item, filterSet.values);
   });
@@ -76,9 +76,9 @@ function applyAndFilters(item: DataItem, andFilters: IAndFilters[]): boolean {
 
 export function applyComplexFilters(
   data: DataType,
-  complexFilters: IAndFilters[]
+  complexFilters: IFilterGroup[]
 ): DataItem[] {
-  let missedOperator: IOrFilters | undefined;
+  let missedOperator: IFilterItem | undefined;
   complexFilters.forEach((andFilter) => {
     if (missedOperator) {
       return;

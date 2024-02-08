@@ -1,36 +1,38 @@
 import {
   Box,
+  IconButton,
   SelectChangeEvent,
   Skeleton,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import { LineSkeleton } from "../shared/feedback/Skeleton";
+
 import { Fragment, useRef } from "react";
 import { Select } from "../shared/form/Select";
 import { Tooltip } from "../shared/feedback/Tooltip";
 import { Add, Delete, Report } from "@mui/icons-material";
 import { FULL_WIDTH } from "../../constants/fullWidth";
-import { IChangeItemParams, IFilterError } from "./Filter";
-import { IOrFilters } from "../../interfaces/filterInterfaces";
+import { IChangeItemParams, IFilterError } from "./FilterGroup";
+import { IFilterItem } from "../../interfaces/filterInterfaces";
 import { IOptions } from "../../interfaces/formInterfaces";
 import { OperatorConstant } from "../../constants/filterConstants";
+import { FilterSkeleton } from "./FilterSkeleton";
 
-interface IOrFiltersProps {
+interface IFilterItemProps {
   isLoading: boolean;
   index: number;
   error?: IFilterError;
   filterGroupId: string;
   fields?: IOptions[];
-  orFilter: IOrFilters;
+  filterItem: IFilterItem;
   handleChangeInput: (e: IChangeItemParams<string>) => void;
   addOr: (id: string) => void;
   removeOr: (andId: string, orId: string) => void;
   isFirstLine: boolean;
 }
 
-export function OrFilter({
+export function FilterItem({
   isLoading,
   index,
   error,
@@ -38,11 +40,12 @@ export function OrFilter({
   fields,
   addOr,
   removeOr,
-  orFilter: { id, column, operator, value },
+  filterItem: { id, column, operator, value },
   handleChangeInput,
   isFirstLine,
-}: IOrFiltersProps) {
+}: IFilterItemProps) {
   const skeleton = useRef<HTMLDivElement>(null);
+
   return (
     <Stack width="100%">
       <Stack
@@ -55,7 +58,7 @@ export function OrFilter({
         spacing="5px"
       >
         {isLoading ? (
-          <LineSkeleton />
+          <FilterSkeleton />
         ) : (
           <Fragment>
             {index > 0 && (
@@ -133,12 +136,12 @@ export function OrFilter({
                 }
               }}
             />
-
-            <Delete
-              cursor={isFirstLine ? "not-allowed" : "pointer"}
-              color={isFirstLine ? "disabled" : "warning"}
+            <IconButton
+              disabled={isFirstLine}
               onClick={() => removeOr(filterGroupId, id)}
-            />
+            >
+              <Delete color={isFirstLine ? "disabled" : "warning"} />
+            </IconButton>
           </Fragment>
         )}
       </Stack>

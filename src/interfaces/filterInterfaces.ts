@@ -1,15 +1,20 @@
 import { OperatorEnum } from "../enums/OperatorEnum";
 
-export type OnFilterFunc = (filters: IAndFilters[]) => void;
-
-export interface IOrFilters {
+export interface IFilterItem {
   id: string;
   column: string;
   operator: OperatorEnum;
   value: string;
 }
 
-export interface IAndFilters {
+export interface IFilterGroup {
   id: string;
-  values: IOrFilters[];
+  values: IFilterItem[];
 }
+
+export interface IOnChangeFilterParams {
+  newValues: IFilterGroup[];
+  shouldRefilter?: boolean;
+}
+
+export type OnFilterChangeFunction = (params: IOnChangeFilterParams) => void;
