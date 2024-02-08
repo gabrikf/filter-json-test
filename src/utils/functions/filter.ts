@@ -1,7 +1,9 @@
+import { isAfter, isBefore, isEqual, parseISO } from "date-fns";
 import { DataItem, DataType } from "../../App";
 import { OperatorEnum } from "../../enums/OperatorEnum";
 import { FilterError } from "../../helpers/errors";
 import { IFilterGroup, IFilterItem } from "../../interfaces/filterInterfaces";
+import { isValidStringDate } from "./isValidStringDate";
 
 export interface IApllyFilterParams {
   id: string;
@@ -16,8 +18,29 @@ function isNumericalOperator(operator: OperatorEnum) {
   return NUMERAL_OPERATORS.includes(operator);
 }
 
-function applyFilter({ fieldValue, operator, value, id }: IApllyFilterParams) {
+function convertValue(
+  value: string | number | boolean,
+  operator: OperatorEnum
+) {
+  if (isValidStringDate(value)) {
+    return parseISO(value as string);
+  }
   if (isNumericalOperator(operator)) {
+    return Number(value);
+  }
+  return value;
+}
+
+function applyFilter({ fieldValue, operator, value, id }: IApllyFilterParams) {
+  const isDateValue = isValidStringDate(value);
+
+  const isDateFieldValue = isValidStringDate(fieldValue);
+
+  if (isDateFieldValue && !isDateValue) {
+    throw new FilterError(id, `Value for date field must be a date: ${value}`);
+  }
+
+  if (isNumericalOperator(operator) && !isDateValue) {
     if (isNaN(Number(value))) {
       throw new FilterError(
         id,
@@ -26,17 +49,24 @@ function applyFilter({ fieldValue, operator, value, id }: IApllyFilterParams) {
     }
   }
 
-  const convertedValue = isNumericalOperator(operator) ? Number(value) : value;
-  const convertedFieldValue = isNumericalOperator(operator)
-    ? Number(fieldValue)
-    : fieldValue;
+  const convertedValue = convertValue(value, operator);
+  const convertedFieldValue = convertValue(fieldValue, operator);
 
   switch (operator) {
     case OperatorEnum.Equal:
+      if (isDateValue) {
+        return isEqual(convertedFieldValue as Date, convertedValue as Date);
+      }
       return convertedFieldValue === convertedValue;
     case OperatorEnum.GreaterThan:
+      if (isDateValue) {
+        return isAfter(convertedFieldValue as Date, convertedValue as Date);
+      }
       return convertedFieldValue > convertedValue;
     case OperatorEnum.LessThen:
+      if (isDateValue) {
+        return isBefore(convertedFieldValue as Date, convertedValue as Date);
+      }
       return convertedFieldValue < convertedValue;
     case OperatorEnum.Contain:
       return (convertedFieldValue as string).includes(convertedValue as string);
