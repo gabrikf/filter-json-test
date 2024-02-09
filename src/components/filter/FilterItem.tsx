@@ -115,7 +115,7 @@ export function FilterItem({
               arrow
               title={error && error?.id === id ? error.message : "No errors"}
             >
-              <Report color={error?.id ? "error" : "primary"} />
+              <Report color={error?.id === id ? "error" : "primary"} />
             </Tooltip>
 
             <Add
