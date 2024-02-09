@@ -65,8 +65,17 @@ function App() {
           ...currentValues,
           filterError: undefined,
         }));
+        const filter = filterValues.map((filter) => ({
+          ...filter,
+          values:
+            filter.values.length > 1
+              ? filter.values.filter(
+                  (value) => value.column && value.operator && value.value
+                )
+              : filter.values,
+        }));
 
-        return setFilteredData(applyComplexFilters(data, filterValues));
+        return setFilteredData(applyComplexFilters(data, filter));
       } catch (err) {
         setError((currentValues) => {
           if (err instanceof FilterError) {
@@ -85,6 +94,7 @@ function App() {
     [data, setError]
   );
 
+  // using this function to avoid calling onFilter on every change
   const handleChangeFilter = useCallback<OnFilterChangeFunction>(
     ({ newValues, shouldRefilter = true }: IOnChangeFilterParams) => {
       setFilterOptions(newValues);
@@ -121,6 +131,7 @@ function App() {
         placeholder="Insert here the url..."
         variant="outlined"
         onChange={(e) => debouncedGetData(e.target.value)}
+        helperText="Insert data url. Returning data MUST be an array json with each element in key/value pair."
       />
       <FilterGroup
         filterValues={filterOptions}
